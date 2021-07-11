@@ -77,6 +77,34 @@ def DFSSolver(initial, goal, max_depth):
     else:
         return construct_moves(state, prev)
 
+
+def DLSSolver(initial, goal, max_depth):
+    prev = recur_DLS(initial, initial, goal, max_depth)
+    if prev is not None:
+        return construct_moves(goal, prev)
+    else:
+        return None, None
+
+
+def recur_DLS(initial, state, goal, max_depth):
+    if state == goal:
+        # return [state]
+        return {list_to_str(initial):None}
+    elif max_depth == 0:
+        LOGGER.debug(f'Reached maximum depth')
+        return None
+    else:
+        successors = compute_successors(state, initial=initial)
+        for suc in successors:
+            prev = recur_DLS(initial, suc, goal, max_depth-1)
+            if prev is not None:
+                # result.append(state)
+                prev[list_to_str(suc)] = state
+                LOGGER.debug(state)
+                return prev
+        return None
+
+
 if __name__ == '__main__':
     max_degree = 11
     initial = generate_puzzle(max_degree)
