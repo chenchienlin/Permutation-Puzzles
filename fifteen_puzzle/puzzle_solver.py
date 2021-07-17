@@ -3,7 +3,7 @@ from collections import deque
 from fifteen_puzzle.puzzle_solver_util import *
 from fifteen_puzzle.impossible_fifteen_puzzle import check_solvability
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger()
 
 def BFSSolver(initial, goal):
@@ -173,8 +173,61 @@ def BestFSSolver(initial, goal):
     return construct_moves(state, prev)
 
 
+def AStarSolver(initial, goal):
+    BLANK = 16
+    initial_str= list_to_str(initial)
+    g_cost = dict()
+    h_cost = dict()
+    path_cost = 0
+    g_cost[initial_str] = path_cost
+    
+    heuristic = manhattan_distance(initial, goal)
+    # heuristic = misplace(initial, goal)
+    
+    PQ = list()
+    f_cost = g_cost[initial_str] + heuristic
+    heapq.heappush(PQ, (f_cost, initial))
+    
+    prev = dict()
+    prev[initial_str] = None
+    explored = set()
+    state = None
+    while len(PQ) > 0:
+        while True:
+            tup = heapq.heappop(PQ)
+            f_cost, state = tup[0], tup[1]
+            state_str = list_to_str(state)
+            path_cost = g_cost[state_str]
+            if state_str not in explored:
+                break
+        LOGGER.debug(f'Proccessed state {state}')
+        if state == goal:
+            break
+        
+        explored.add(state_str)
+        successors = compute_successors(state, initial=initial)
+        for suc in successors:
+            suc_str = list_to_str(suc)
+            
+            heuristic = manhattan_distance(suc, goal)
+            # heuristic = misplace(suc, goal)
+            
+            suc_f_cost = path_cost + 1 + heuristic
+            if suc_str not in prev: # if the suc state haven't been found yet
+                prev[suc_str] = state
+                g_cost[suc_str] = path_cost + 1
+                heapq.heappush(PQ, (suc_f_cost, suc))
+            elif suc_str in prev and suc_str not in explored:
+                old_g_cost = g_cost[suc_str]
+                if path_cost + 1 < old_g_cost:
+                    prev[suc_str] = state
+                    g_cost[suc_str] = path_cost + 1
+                    heapq.heappush(PQ, (suc_f_cost, suc))
+    return construct_moves(goal, prev)
+
+
 if __name__ == '__main__':
-    max_degree = 11
+    max_degree = 22
     initial = generate_puzzle(max_degree)
     size = 16
     goal = [i+1 for i in range(size)]
@@ -183,6 +236,7 @@ if __name__ == '__main__':
     LOGGER.debug(f'Solvable : {solvable}')
     # _, moves_bfs = BFSSolver(initial, goal)
     # _, moves_ids = IDSSolver(initial, goal, max_degree)
+    _, moves_astar = AStarSolver(initial, goal)
     # assert len(moves) == len(moves_ids)
-    # from fifteen_puzzle.puzzle_solver_pygame import main
-    # main(initial, moves, trace=True)
+    from fifteen_puzzle.puzzle_solver_pygame import main
+    main(initial, moves=moves_astar, trace=True)

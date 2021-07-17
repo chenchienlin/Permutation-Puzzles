@@ -116,17 +116,17 @@ def test_manhattan_distance1():
     size = 16
     goal = [i+1 for i in range(size)]
     initial = goal.copy()
-    swap(initial, 0, 15)
+    swap(initial, 0, 3)
     
     print_puzzle(initial, name='Initial')
     print_puzzle(goal, name='Goal')
-    assert manhattan_distance(initial, goal) == 12
+    assert manhattan_distance(initial, goal) == 6
     
     initial = goal.copy()
-    swap(initial, 11, 15)
+    swap(initial, 11, 12)
     print_puzzle(initial, name='Initial')
     print_puzzle(goal, name='Goal')
-    assert manhattan_distance(initial, goal, n_col=4) == 2
+    assert manhattan_distance(initial, goal, n_col=4) == 8
 
 def test_manhattan_distance2():
     # initial           goal
@@ -140,3 +140,13 @@ def test_manhattan_distance2():
     print_puzzle(initial, n_col=3, n_row=3, name='Initial')
     print_puzzle(goal, n_col=3, n_row=3, name='Goal')
     assert manhattan_distance(initial, goal, n_col=3) == 18
+
+def test_misplace1():
+    size = 16
+    goal = [i+1 for i in range(size)]
+    initial = goal.copy()
+    swap(initial, 0, 15)
+    assert misplace(initial, goal) == 2
+    
+    swap(initial, 1, 14)
+    assert misplace(initial, goal) == 4

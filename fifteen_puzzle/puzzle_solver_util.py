@@ -137,10 +137,23 @@ def construct_moves(goal, prev):
     return curr, moves
 
 def manhattan_distance(state, goal, n_col=4):
-    diff = [sidx-gidx for sidx, gidx in zip(state, goal)]
+    BLANK = n_col ** 2
     cost = 0
-    for elem in diff:
-        x, y = idx_to_xy(abs(elem), n_col)
-        cost += x
-        cost += y
+    for gidx in range(len(goal)):
+        target = goal[gidx]
+        # Don't include BLANK square in cost
+        if target == BLANK:
+            continue
+        sidx = find_idx(state, target)
+        sx, sy = idx_to_xy(sidx, n_col)
+        gx, gy = idx_to_xy(gidx, n_col)
+        cost += abs(gx-sx)
+        cost += abs(gy-sy)
+    return cost
+
+def misplace(state, goal):
+    cost = 0
+    for s, g in zip(state, goal):
+        if s != g:
+            cost += 1
     return cost

@@ -78,7 +78,7 @@ def test_BestFSSolver1():
         curr_best, _ = BestFSSolver(initial, goal)
         assert curr_best == goal
 
-def test_UCSSolver1():
+def test_UCSSolver_AStarSolver1():
     iter = 100
     for _ in range(iter):
         size = 16
@@ -87,5 +87,19 @@ def test_UCSSolver1():
         goal = [i+1 for i in range(size)]
         sol1, moves_bfs = BFSSolver(initial, goal)
         sol2, moves_ucs = UCSSolver(initial, goal)
-        assert sol1 == sol2 == goal
+        sol3, moves_astar = AStarSolver(initial, goal)
+        assert sol1 == sol2 == sol3 == goal
         assert len(moves_bfs) == len(moves_ucs)
+        assert len(moves_bfs) == len(moves_astar)
+
+def test_AStartSolver1():
+    iter = 100
+    for i in range(iter):
+        size = 16
+        max_degree = 22
+        initial = generate_puzzle(max_degree)
+        goal = [i+1 for i in range(size)]
+        sol, moves_astar = AStarSolver(initial, goal)
+        assert sol == goal
+        assert len(moves_astar) <= max_degree
+        LOGGER.info(f'Iteration: {i}')
