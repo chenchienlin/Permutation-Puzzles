@@ -48,11 +48,14 @@ def swap(arr, i, j):
     arr[i] = arr[j]
     arr[j] = temp
 
-def print_puzzle(puzzle, n_col=4, n_row=4):
-    s = '\n'
+def print_puzzle(puzzle, n_col=4, n_row=4, name=None):
+    if name is not None:
+        s = f'\n===== {name} =====\n'
+    else:
+        s = '\n'
     for r in range(n_row):
         for c in range(n_col):
-            idx = xy_to_idx(c, r)
+            idx = xy_to_idx(c, r, n_col)
             n_digit = len(str((puzzle[idx])))
             if n_digit == 1:
                 s = f'{s} {puzzle[idx]} '
@@ -83,9 +86,13 @@ def list_to_str(l):
 def generate_puzzle(max_degree):
     size = 16
     puzzle = [i+1 for i in range(size)]
+    s = set()
     for _ in range(max_degree):
         successors = compute_successors(puzzle)
         rand = randint(0, len(successors)-1)
+        while list_to_str(successors[rand]) in s:
+            rand = randint(0, len(successors)-1)
+        s.add(list_to_str(successors[rand]))
         puzzle = successors[rand]
     return puzzle
 
@@ -128,3 +135,12 @@ def construct_moves(goal, prev):
         curr = next
     print_puzzle(curr)
     return curr, moves
+
+def manhattan_distance(state, goal, n_col=4):
+    diff = [sidx-gidx for sidx, gidx in zip(state, goal)]
+    cost = 0
+    for elem in diff:
+        x, y = idx_to_xy(abs(elem), n_col)
+        cost += x
+        cost += y
+    return cost

@@ -91,7 +91,7 @@ def recur_DLS(initial, state, goal, max_depth):
         # return [state]
         return {list_to_str(initial):None}
     elif max_depth == 0:
-        LOGGER.debug(f'Reached maximum depth')
+        # LOGGER.debug(f'Reached maximum depth')
         return None
     else:
         successors = compute_successors(state, initial=initial)
@@ -105,6 +105,15 @@ def recur_DLS(initial, state, goal, max_depth):
         return None
 
 
+def IDSSolver(initial, goal, max_depth):
+    depth = 0
+    moves = None
+    while moves is None and depth <= max_depth:
+        curr, moves = DLSSolver(initial, goal, depth)
+        depth += 1
+    return curr, moves
+
+
 if __name__ == '__main__':
     max_degree = 11
     initial = generate_puzzle(max_degree)
@@ -113,7 +122,8 @@ if __name__ == '__main__':
     solvable = check_solvability(initial, goal)
     LOGGER.debug(f'Puzzle : {initial}')
     LOGGER.debug(f'Solvable : {solvable}')
-    _, moves = BFSSolver(initial, goal)
-    
-    from fifteen_puzzle.puzzle_solver_pygame import main
-    main(initial, moves, trace=True)
+    # _, moves = BFSSolver(initial, goal)
+    # _, moves_ids = IDSSolver(initial, goal, max_degree)
+    # assert len(moves) == len(moves_ids)
+    # from fifteen_puzzle.puzzle_solver_pygame import main
+    # main(initial, moves, trace=True)

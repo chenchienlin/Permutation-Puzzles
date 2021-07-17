@@ -111,3 +111,32 @@ def test_compute_successors2():
     assert top_suc == [1,6,3,4,5,2,7,8,9,10,11,12,13,14,15,16]
     assert right_suc == [1,2,3,4,5,7,6,8,9,10,11,12,13,14,15,16]
     assert down_suc == [1,2,3,4,5,10,7,8,9,6,11,12,13,14,15,16]
+
+def test_manhattan_distance1():
+    size = 16
+    goal = [i+1 for i in range(size)]
+    initial = goal.copy()
+    swap(initial, 0, 15)
+    
+    print_puzzle(initial, name='Initial')
+    print_puzzle(goal, name='Goal')
+    assert manhattan_distance(initial, goal) == 12
+    
+    initial = goal.copy()
+    swap(initial, 11, 15)
+    print_puzzle(initial, name='Initial')
+    print_puzzle(goal, name='Goal')
+    assert manhattan_distance(initial, goal, n_col=4) == 2
+
+def test_manhattan_distance2():
+    # initial           goal
+    # [ 7  2  4 ]       [ 9  1  2 ]
+    # [ 5  9  6 ]       [ 3  4  5 ]
+    # [ 8  3  1 ]       [ 6  7  8 ]
+    size = 9
+    goal = [i+1 for i in range(size-1)]
+    goal.insert(0, size)
+    initial = [7,2,4,5,9,6,8,3,1]
+    print_puzzle(initial, n_col=3, n_row=3, name='Initial')
+    print_puzzle(goal, n_col=3, n_row=3, name='Goal')
+    assert manhattan_distance(initial, goal, n_col=3) == 18
