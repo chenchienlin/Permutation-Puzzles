@@ -28,6 +28,47 @@ def BFSSolver(initial, goal):
     
     return construct_moves(state, prev)
 
+def UCSSolver(initial, goal):
+    BLANK = 16
+    PQ = list()
+    path_cost = 0
+    heapq.heappush(PQ, (path_cost, initial))
+    cost = dict()
+    cost[list_to_str(initial)] = path_cost
+    prev = dict()
+    prev[list_to_str(initial)] = None
+    explored = set()
+    state = None
+    
+    while len(PQ) > 0:
+        while True:
+            tup = heapq.heappop(PQ)
+            path_cost, state = tup[0], tup[1]
+            state_str = list_to_str(state)
+            if state_str not in explored:
+                break
+        LOGGER.debug(f'Proccessed state {state}')
+        if state == goal:
+            break
+        
+        explored.add(state_str)
+        successors = compute_successors(state, initial=initial)
+        for suc in successors:
+            suc_str = list_to_str(suc)
+            suc_path_cost = path_cost + 1
+            if suc_str not in prev: # if the suc state haven't been found yet
+                prev[suc_str] = state
+                cost[suc_str] = suc_path_cost
+                heapq.heappush(PQ, (suc_path_cost, suc))
+            elif suc_str in prev and suc_str not in explored:
+                old_path_cost = cost[suc_str]
+                if suc_path_cost < old_path_cost:
+                    prev[suc_str] = state
+                    cost[suc_str] = suc_path_cost
+                    heapq.heappush(PQ, (suc_path_cost, suc))
+    
+    return construct_moves(goal, prev)
+
 
 def DFSSolver(initial, goal, max_depth):
     BLANK = 16
@@ -140,7 +181,7 @@ if __name__ == '__main__':
     solvable = check_solvability(initial, goal)
     LOGGER.debug(f'Puzzle : {initial}')
     LOGGER.debug(f'Solvable : {solvable}')
-    # _, moves = BFSSolver(initial, goal)
+    # _, moves_bfs = BFSSolver(initial, goal)
     # _, moves_ids = IDSSolver(initial, goal, max_degree)
     # assert len(moves) == len(moves_ids)
     # from fifteen_puzzle.puzzle_solver_pygame import main
