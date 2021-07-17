@@ -1,5 +1,5 @@
+import heapq
 from collections import deque
-from os import stat
 from fifteen_puzzle.puzzle_solver_util import *
 from fifteen_puzzle.impossible_fifteen_puzzle import check_solvability
 import logging
@@ -15,14 +15,11 @@ def BFSSolver(initial, goal):
     state = None
     while True:
         state = Q.popleft()
-        # LOGGER.debug(f'Proccessed state {state}')
+        LOGGER.debug(f'Proccessed state {state}')
         if state == goal:
-            # return prev
             break
-        # predecessor = prev[list_to_str(state)]
         successors = compute_successors(state, initial=initial)
         for suc in successors:
-            # LOGGER.debug(f'Successors state {suc}  Valid {suc!=predecessor}')
             if list_to_str(suc) not in prev:
                 prev[list_to_str(suc)] = state
                 Q.append(suc)
@@ -56,7 +53,7 @@ def DFSSolver(initial, goal, max_depth):
                 LOGGER.debug('Found goal')
                 break
             if depth[state_str] > max_depth:
-                # LOGGER.debug('Maximum depth')
+                LOGGER.debug('Maximum depth')
                 continue
             else:
                 successors = compute_successors(state, initial=initial)
@@ -67,10 +64,7 @@ def DFSSolver(initial, goal, max_depth):
                         visited[suc_str] = False
                         prev[suc_str] = state
                         depth[suc_str] = depth[state_str] + 1
-                        # LOGGER.debug(f'depth {depth[suc_str]}')
                         S.append(suc)
-                    # else:
-                    #     LOGGER.debug('Duplicate')
     if state != goal:
         LOGGER.warning('Not found goal')
         return DFSSolver(initial, goal, int(max_depth * 1.1))
@@ -88,17 +82,15 @@ def DLSSolver(initial, goal, max_depth):
 
 def recur_DLS(initial, state, goal, max_depth):
     if state == goal:
-        # return [state]
         return {list_to_str(initial):None}
     elif max_depth == 0:
-        # LOGGER.debug(f'Reached maximum depth')
+        LOGGER.debug(f'Reached maximum depth')
         return None
     else:
         successors = compute_successors(state, initial=initial)
         for suc in successors:
             prev = recur_DLS(initial, suc, goal, max_depth-1)
             if prev is not None:
-                # result.append(state)
                 prev[list_to_str(suc)] = state
                 LOGGER.debug(state)
                 return prev
@@ -112,6 +104,32 @@ def IDSSolver(initial, goal, max_depth):
         curr, moves = DLSSolver(initial, goal, depth)
         depth += 1
     return curr, moves
+
+
+def BestFSSolver(initial, goal):
+    BLANK = 16
+    PQ = list()
+    cost = manhattan_distance(initial, goal)
+    heapq.heappush(PQ, (cost, initial))
+    prev = dict()
+    prev[list_to_str(initial)] = None
+    state = None
+    while len(PQ) > 0:
+        tup = heapq.heappop(PQ)
+        cost, state = tup[0], tup[1]
+        LOGGER.debug(f'Proccessed state {state}')
+        if state == goal:
+            break
+        successors = compute_successors(state, initial=initial)
+        for suc in successors:
+            if list_to_str(suc) not in prev:
+                prev[list_to_str(suc)] = state
+                cost = manhattan_distance(suc, goal)
+                heapq.heappush(PQ, (cost, suc))
+            else:
+                LOGGER.debug('Duplicate')
+    
+    return construct_moves(state, prev)
 
 
 if __name__ == '__main__':
