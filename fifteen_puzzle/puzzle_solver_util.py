@@ -74,10 +74,21 @@ def compute_successors(predecessor, blank_idx=None, initial=None):
         if nb is not None:
             puzzle = predecessor.copy()
             swap(puzzle, blank_idx, nb)
+            LOGGER.error(initial)
+            LOGGER.error(puzzle)
             if initial is None:
                 successors.append(puzzle)
             elif initial is not None and puzzle != initial:
                 successors.append(puzzle)
+                
+    try:
+        assert len(successors) >= 2
+    except AssertionError as ae:
+        LOGGER.error(blank_idx)
+        LOGGER.error(predecessor)
+        print_puzzle(predecessor)
+        LOGGER.error(ngbrs)
+        raise ae
     return successors
 
 def list_to_str(l):

@@ -225,6 +225,40 @@ def AStarSolver(initial, goal):
                     heapq.heappush(PQ, (suc_f_cost, suc))
     return construct_moves(goal, prev)
 
+def RBFSSolver(initial, goal):
+    prev, _ = RBFS(initial, initial, goal, 0, float('inf'))
+    prev[list_to_str(initial)] = None
+    return construct_moves(goal, prev)
+
+def RBFS(initial, state, goal, curr_depth, f_limit):
+    if state == goal:
+        return {}, f_limit
+    successors = compute_successors(state, initial=initial)
+    PQ = list()
+    for suc in successors:
+        heuristic = manhattan_distance(suc, goal)
+        suc_f_cost = curr_depth + heuristic
+        PQ.append((suc_f_cost, suc))
+    heapq.heapify(PQ)
+    
+    while True:
+        tup = heapq.heappop(PQ)
+        best_f, best_suc = tup[0], tup[1]
+        if best_f > f_limit:
+            return None, best_f
+        
+        if len(PQ) > 0:
+            tup = PQ[0] # peek
+            alter_f, alter_suc = tup[0], tup[1]
+        else:
+            alter_f = best_f
+        prev, f_cost = RBFS(initial, best_suc, goal, curr_depth+1, min(f_limit, alter_f))
+        heapq.heappush(PQ, (f_cost, best_suc))
+        if prev is not None:
+            LOGGER.debug(best_suc)
+            prev[list_to_str(best_suc)] = state
+            return prev, min(f_limit, alter_f)
+
 
 if __name__ == '__main__':
     max_degree = 22
@@ -234,9 +268,13 @@ if __name__ == '__main__':
     solvable = check_solvability(initial, goal)
     LOGGER.debug(f'Puzzle : {initial}')
     LOGGER.debug(f'Solvable : {solvable}')
+    _, moves_astar = AStarSolver(initial, goal)
+    _, moves_rbfs = RBFSSolver(initial, goal)
+    LOGGER.debug(len(moves_rbfs))
+    assert len(moves_astar) == len(moves_rbfs)
+    #_, moves_dls = DLSSolver(initial, goal, max_degree)
     # _, moves_bfs = BFSSolver(initial, goal)
     # _, moves_ids = IDSSolver(initial, goal, max_degree)
-    _, moves_astar = AStarSolver(initial, goal)
     # assert len(moves) == len(moves_ids)
-    from fifteen_puzzle.puzzle_solver_pygame import main
-    main(initial, moves=moves_astar, trace=True)
+    # from fifteen_puzzle.puzzle_solver_pygame import main
+    # main(initial, moves=moves_astar, trace=True)
