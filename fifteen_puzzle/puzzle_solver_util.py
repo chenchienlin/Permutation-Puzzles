@@ -74,8 +74,6 @@ def compute_successors(predecessor, blank_idx=None, initial=None):
         if nb is not None:
             puzzle = predecessor.copy()
             swap(puzzle, blank_idx, nb)
-            LOGGER.error(initial)
-            LOGGER.error(puzzle)
             if initial is None:
                 successors.append(puzzle)
             elif initial is not None and puzzle != initial:
@@ -84,11 +82,12 @@ def compute_successors(predecessor, blank_idx=None, initial=None):
     try:
         assert len(successors) >= 2
     except AssertionError as ae:
-        LOGGER.error(blank_idx)
-        LOGGER.error(predecessor)
-        print_puzzle(predecessor)
-        LOGGER.error(ngbrs)
-        raise ae
+        LOGGER.error(f'Blank block index: {blank_idx}')
+        if blank_idx not in find_corners():
+            LOGGER.error(predecessor)
+            print_puzzle(predecessor)
+            LOGGER.error(ngbrs)
+            raise ae
     return successors
 
 def list_to_str(l):
@@ -101,9 +100,9 @@ def generate_puzzle(max_degree):
     for _ in range(max_degree):
         successors = compute_successors(puzzle)
         rand = randint(0, len(successors)-1)
-        while list_to_str(successors[rand]) in s:
+        while tuple(successors[rand]) in s:
             rand = randint(0, len(successors)-1)
-        s.add(list_to_str(successors[rand]))
+        s.add(tuple(successors[rand]))
         puzzle = successors[rand]
     return puzzle
 
@@ -133,7 +132,7 @@ def construct_moves(goal, prev):
     record = []
     while curr:
         record.append(curr)
-        curr = prev[list_to_str(curr)]
+        curr = prev[tuple(curr)]
     
     moves = []
     curr = record.pop()
@@ -146,6 +145,9 @@ def construct_moves(goal, prev):
         curr = next
     print_puzzle(curr)
     return curr, moves
+
+def find_corners(n_col=4, n_row=4):
+    return (0, 0+n_row-1, (n_col-1)*n_row, n_col*n_row-1)
 
 def manhattan_distance(state, goal, n_col=4):
     BLANK = n_col ** 2

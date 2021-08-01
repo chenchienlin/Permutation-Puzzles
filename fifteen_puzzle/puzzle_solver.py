@@ -11,7 +11,7 @@ def BFSSolver(initial, goal):
     Q = deque()
     Q.append(initial)
     prev = dict()
-    prev[list_to_str(initial)] = None
+    prev[tuple(initial)] = None
     state = None
     while True:
         state = Q.popleft()
@@ -20,8 +20,8 @@ def BFSSolver(initial, goal):
             break
         successors = compute_successors(state, initial=initial)
         for suc in successors:
-            if list_to_str(suc) not in prev:
-                prev[list_to_str(suc)] = state
+            if tuple(suc) not in prev:
+                prev[tuple(suc)] = state
                 Q.append(suc)
             else:
                 LOGGER.debug('Duplicate')
@@ -34,9 +34,9 @@ def UCSSolver(initial, goal):
     path_cost = 0
     heapq.heappush(PQ, (path_cost, initial))
     cost = dict()
-    cost[list_to_str(initial)] = path_cost
+    cost[tuple(initial)] = path_cost
     prev = dict()
-    prev[list_to_str(initial)] = None
+    prev[tuple(initial)] = None
     explored = set()
     state = None
     
@@ -44,7 +44,7 @@ def UCSSolver(initial, goal):
         while True:
             tup = heapq.heappop(PQ)
             path_cost, state = tup[0], tup[1]
-            state_str = list_to_str(state)
+            state_str = tuple(state)
             if state_str not in explored:
                 break
         LOGGER.debug(f'Proccessed state {state}')
@@ -54,7 +54,7 @@ def UCSSolver(initial, goal):
         explored.add(state_str)
         successors = compute_successors(state, initial=initial)
         for suc in successors:
-            suc_str = list_to_str(suc)
+            suc_str = tuple(suc)
             suc_path_cost = path_cost + 1
             if suc_str not in prev: # if the suc state haven't been found yet
                 prev[suc_str] = state
@@ -75,7 +75,7 @@ def DFSSolver(initial, goal, max_depth):
     S = deque()
     S.append(initial)
     
-    initial_str= list_to_str(initial)
+    initial_str= tuple(initial)
     prev = dict()
     prev[initial_str] = None
     
@@ -87,7 +87,7 @@ def DFSSolver(initial, goal, max_depth):
     state = None
     while len(S) > 0:
         state = S.pop()
-        state_str = list_to_str(state)
+        state_str = tuple(state)
         if visited[state_str] is False:
             visited[state_str] = True
             if state == goal:
@@ -99,7 +99,7 @@ def DFSSolver(initial, goal, max_depth):
             else:
                 successors = compute_successors(state, initial=initial)
                 for suc in successors:
-                    suc_str = list_to_str(suc)
+                    suc_str = tuple(suc)
                     # if suc_str not in visited or visited[suc_str] is False:
                     if suc_str not in visited:
                         visited[suc_str] = False
@@ -123,7 +123,7 @@ def DLSSolver(initial, goal, max_depth):
 
 def recur_DLS(initial, state, goal, max_depth):
     if state == goal:
-        return {list_to_str(initial):None}
+        return {tuple(initial):None}
     elif max_depth == 0:
         LOGGER.debug(f'Reached maximum depth')
         return None
@@ -132,7 +132,7 @@ def recur_DLS(initial, state, goal, max_depth):
         for suc in successors:
             prev = recur_DLS(initial, suc, goal, max_depth-1)
             if prev is not None:
-                prev[list_to_str(suc)] = state
+                prev[tuple(suc)] = state
                 LOGGER.debug(state)
                 return prev
         return None
@@ -153,7 +153,7 @@ def BestFSSolver(initial, goal):
     cost = manhattan_distance(initial, goal)
     heapq.heappush(PQ, (cost, initial))
     prev = dict()
-    prev[list_to_str(initial)] = None
+    prev[tuple(initial)] = None
     state = None
     while len(PQ) > 0:
         tup = heapq.heappop(PQ)
@@ -163,8 +163,8 @@ def BestFSSolver(initial, goal):
             break
         successors = compute_successors(state, initial=initial)
         for suc in successors:
-            if list_to_str(suc) not in prev:
-                prev[list_to_str(suc)] = state
+            if tuple(suc) not in prev:
+                prev[tuple(suc)] = state
                 cost = manhattan_distance(suc, goal)
                 heapq.heappush(PQ, (cost, suc))
             else:
@@ -175,7 +175,7 @@ def BestFSSolver(initial, goal):
 
 def AStarSolver(initial, goal):
     BLANK = 16
-    initial_str= list_to_str(initial)
+    initial_str= tuple(initial)
     g_cost = dict()
     h_cost = dict()
     path_cost = 0
@@ -196,7 +196,7 @@ def AStarSolver(initial, goal):
         while True:
             tup = heapq.heappop(PQ)
             f_cost, state = tup[0], tup[1]
-            state_str = list_to_str(state)
+            state_str = tuple(state)
             path_cost = g_cost[state_str]
             if state_str not in explored:
                 break
@@ -207,7 +207,7 @@ def AStarSolver(initial, goal):
         explored.add(state_str)
         successors = compute_successors(state, initial=initial)
         for suc in successors:
-            suc_str = list_to_str(suc)
+            suc_str = tuple(suc)
             
             heuristic = manhattan_distance(suc, goal)
             # heuristic = misplace(suc, goal)
@@ -227,7 +227,7 @@ def AStarSolver(initial, goal):
 
 def RBFSSolver(initial, goal):
     prev, _ = RBFS(initial, initial, goal, 0, float('inf'))
-    prev[list_to_str(initial)] = None
+    prev[tuple(initial)] = None
     return construct_moves(goal, prev)
 
 def RBFS(initial, state, goal, curr_depth, f_limit):
@@ -256,7 +256,7 @@ def RBFS(initial, state, goal, curr_depth, f_limit):
         heapq.heappush(PQ, (f_cost, best_suc))
         if prev is not None:
             LOGGER.debug(best_suc)
-            prev[list_to_str(best_suc)] = state
+            prev[tuple(best_suc)] = state
             return prev, min(f_limit, alter_f)
 
 
@@ -268,13 +268,8 @@ if __name__ == '__main__':
     solvable = check_solvability(initial, goal)
     LOGGER.debug(f'Puzzle : {initial}')
     LOGGER.debug(f'Solvable : {solvable}')
-    _, moves_astar = AStarSolver(initial, goal)
+    # _, moves_astar = AStarSolver(initial, goal)
     _, moves_rbfs = RBFSSolver(initial, goal)
     LOGGER.debug(len(moves_rbfs))
-    assert len(moves_astar) == len(moves_rbfs)
-    #_, moves_dls = DLSSolver(initial, goal, max_degree)
-    # _, moves_bfs = BFSSolver(initial, goal)
-    # _, moves_ids = IDSSolver(initial, goal, max_degree)
-    # assert len(moves) == len(moves_ids)
-    # from fifteen_puzzle.puzzle_solver_pygame import main
-    # main(initial, moves=moves_astar, trace=True)
+    from fifteen_puzzle.puzzle_solver_pygame import main
+    main(initial, moves=moves_rbfs, trace=True)

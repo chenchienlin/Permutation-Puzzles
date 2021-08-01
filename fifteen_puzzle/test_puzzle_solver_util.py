@@ -112,6 +112,12 @@ def test_compute_successors2():
     assert right_suc == [1,2,3,4,5,7,6,8,9,10,11,12,13,14,15,16]
     assert down_suc == [1,2,3,4,5,10,7,8,9,6,11,12,13,14,15,16]
 
+def test_find_corners1():
+    assert find_corners() == (0, 3, 12, 15)
+
+def test_find_corners2():
+    assert find_corners(n_col=3, n_row=3) == (0, 2, 6, 8)
+
 def test_manhattan_distance1():
     size = 16
     goal = [i+1 for i in range(size)]
