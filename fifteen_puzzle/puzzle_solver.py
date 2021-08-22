@@ -1,10 +1,11 @@
+import argparse
 import heapq
 from collections import deque
-from fifteen_puzzle.puzzle_solver_util import *
-from fifteen_puzzle.impossible_fifteen_puzzle import check_solvability
-import logging
-logging.basicConfig(level=logging.INFO)
-LOGGER = logging.getLogger()
+from fifteen_puzzle.utils.puzzle_solver_util import *
+from fifteen_puzzle.utils.impossible_fifteen_puzzle import check_solvability
+from fifteen_puzzle.utils.logger import logger as LOGGER
+from fifteen_puzzle.utils.logger import set_log_level
+
 
 def BFSSolver(initial, goal):
     BLANK = 16
@@ -120,7 +121,6 @@ def DLSSolver(initial, goal, max_depth):
     else:
         return None, None
 
-
 def recur_DLS(initial, state, goal, max_depth):
     if state == goal:
         return {tuple(initial):None}
@@ -225,6 +225,7 @@ def AStarSolver(initial, goal):
                     heapq.heappush(PQ, (suc_f_cost, suc))
     return construct_moves(goal, prev)
 
+
 def RBFSSolver(initial, goal):
     prev, _ = RBFS(initial, initial, goal, 0, float('inf'))
     prev[tuple(initial)] = None
@@ -261,15 +262,30 @@ def RBFS(initial, state, goal, curr_depth, f_limit):
 
 
 if __name__ == '__main__':
-    max_degree = 22
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--max_degree", help="The maximum depth of the solution. The maximum depth should between 0 to 25", type=int)
+    parser.add_argument("--debug", type=str, )
+    args = parser.parse_args()
+    try:
+        max_degree = args.max_degree
+        assert max_degree >= 0 and max_degree <= 25
+    except AssertionError as ae:
+        raise ValueError("The argument max_degree is out of range. (The maximum depth should between 0 to 25).")
+    try:
+        debug = args.debug
+        assert debug == None or debug == 'debug' or debug == 'info' or debug == 'warning' or debug == 'critical' or debug == 'error'
+        if debug:
+            set_log_level(LOGGER, debug)
+    except AssertionError as ae:
+        raise ValueError('debug')
+    
     initial = generate_puzzle(max_degree)
     size = 16
     goal = [i+1 for i in range(size)]
     solvable = check_solvability(initial, goal)
     LOGGER.debug(f'Puzzle : {initial}')
     LOGGER.debug(f'Solvable : {solvable}')
-    # _, moves_astar = AStarSolver(initial, goal)
     _, moves_rbfs = RBFSSolver(initial, goal)
     LOGGER.debug(len(moves_rbfs))
-    from fifteen_puzzle.puzzle_solver_pygame import main
+    from fifteen_puzzle.utils.puzzle_solver_pygame import main
     main(initial, moves=moves_rbfs, trace=True)

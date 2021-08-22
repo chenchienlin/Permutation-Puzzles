@@ -1,9 +1,7 @@
 import sys
 import pygame
-from fifteen_puzzle.puzzle_solver_util import idx_to_xy, swap
-import logging
-logging.basicConfig(level=logging.DEBUG)
-LOGGER = logging.getLogger()
+from fifteen_puzzle.utils.puzzle_solver_util import idx_to_xy, swap
+from fifteen_puzzle.utils.logger import logger as LOGGER
 
 N_COL = 4
 N_ROW = 4

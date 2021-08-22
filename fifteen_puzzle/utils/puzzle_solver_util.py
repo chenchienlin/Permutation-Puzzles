@@ -1,10 +1,8 @@
 import math
 import random
 from random import randint
-from fifteen_puzzle.impossible_fifteen_puzzle import check_solvability
-import logging
-logging.basicConfig(level=logging.DEBUG)
-LOGGER = logging.getLogger()
+from fifteen_puzzle.utils.impossible_fifteen_puzzle import check_solvability
+from fifteen_puzzle.utils.logger import logger as LOGGER
 
 def find_idx(arr, target):
     for i in range(0, len(arr)):
@@ -62,7 +60,7 @@ def print_puzzle(puzzle, n_col=4, n_row=4, name=None):
             else:
                 s = f'{s} {puzzle[idx]}'
         s = f'{s}\n'
-    LOGGER.debug(s)
+    LOGGER.info(s)
 
 def compute_successors(predecessor, blank_idx=None, initial=None):
     BLANK = 16
@@ -82,7 +80,7 @@ def compute_successors(predecessor, blank_idx=None, initial=None):
     try:
         assert len(successors) >= 2
     except AssertionError as ae:
-        LOGGER.error(f'Blank block index: {blank_idx}')
+        LOGGER.warning(f'Blank block index: {blank_idx}. Blank block is at the corner. Number of valid neighbors is less than 2.')
         if blank_idx not in find_corners():
             LOGGER.error(predecessor)
             print_puzzle(predecessor)
@@ -141,7 +139,7 @@ def construct_moves(goal, prev):
         next = record.pop()
         motion = find_swap(curr, next)
         moves.append(motion)
-        LOGGER.debug(f'Swap {curr[motion[0]]} {curr[motion[1]]}\n')
+        LOGGER.info(f'Swap {curr[motion[0]]} {curr[motion[1]]}\n')
         curr = next
     print_puzzle(curr)
     return curr, moves

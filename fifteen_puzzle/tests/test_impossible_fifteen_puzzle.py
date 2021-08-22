@@ -1,6 +1,6 @@
 import random
 import logging
-from fifteen_puzzle.impossible_fifteen_puzzle import *
+from fifteen_puzzle.utils.impossible_fifteen_puzzle import *
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger()
 

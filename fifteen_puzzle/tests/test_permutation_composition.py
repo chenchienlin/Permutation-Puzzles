@@ -1,6 +1,6 @@
 import random
 import logging
-from fifteen_puzzle.permutation_composition import *
+from fifteen_puzzle.utils.permutation_composition import *
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger()
 

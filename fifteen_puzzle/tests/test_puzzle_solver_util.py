@@ -1,5 +1,5 @@
 import logging
-from fifteen_puzzle.puzzle_solver_util import *
+from fifteen_puzzle.utils.puzzle_solver_util import *
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger()
 
