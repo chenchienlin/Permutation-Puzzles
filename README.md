@@ -1,7 +1,7 @@
 # Permutation-Puzzles
 
 ## About The Project
-This project is for practicing common graph algorithms, such as BFS, DFS, A*, RBFS, etc, and using these these algorithms to solve 15 puzzle.
+This project is for practicing common graph algorithms, such as BFS, DFS, A*, RBFS, etc, and using these algorithms to solve 15 puzzle.
 
 ## Build With
 
@@ -31,3 +31,7 @@ python -m fifteen_puzzle.puzzle_solver --max_degree 20 --debug info > output.txt
 
 ### Termination
 Hit `ecs` to terminate `pygame`
+
+## Reference
+- [Permutation Puzzles - Math 304 - Simon Fraser University](http://www.sfu.ca/~jtmulhol/math302/lectures.html)
+- [Artificial Intelligence: A Modern Approach 3rd Edition](https://www.amazon.com/Artificial-Intelligence-Modern-Approach-3rd/dp/0136042597)
